@@ -2,6 +2,7 @@ from PIL import Image
 import os
 import numpy as np 
 from sklearn.model_selection import train_test_split
+from sklearn.decomposition import PCA
 # Set the path to the folders containing the images and labels
 
 class ReadImages():
@@ -20,6 +21,7 @@ class ReadImages():
 
     # Loop through each subfolder and read in the images and labels
     def Reading(self):
+        pca = PCA(n_components=128)
         for subfolder in os.listdir(self.parent_folder_path):
             if subfolder.startswith('.'):
                 continue  
@@ -37,24 +39,30 @@ class ReadImages():
                         continue  # skip hidden files and folders
                     if file.endswith(".jpg") or file.endswith(".jpeg") or file.endswith(".png"):
                         img = Image.open(os.path.join(folder_path, file))
-                        img=img.convert("L")
-                        img_array = np.array(img).flatten()
-                        self.images.append(img_array)
+                        img = img.convert("L")
+                        img=img.resize((380,360))
+                        img_array = np.array(img)
+                        self.images.append(img_array)  # add the image array to the list
                         label_str = folder
                         label = self.label_map[label_str]
                         self.labels.append(label)
+        self.images=np.array(self.images)
+        pca = PCA(n_components=128)
+        self.images = pca.fit_transform(self.images.reshape(-1, 360*380))
+        self.images = self.images.reshape(-1, 128)
+        
 
 
     def Split(self):
         self.training_images, X_test_val, self.training_labels, y_test_val = train_test_split(self.images, self.labels, test_size=0.2, random_state=42)
-        self.testing_images,self.testing_labels,self.validation_images,self.validation_labels=train_test_split(
+        self.testing_images,self.validation_images,self.testing_labels,self.validation_labels=train_test_split(
             X_test_val, y_test_val, test_size=0.1, random_state=42)
         
     def get_training(self):
-        return self.testing_images,self.training_labels
+        return self.training_images,self.training_labels
     
     def get_testing(self):
-        return self.training_images,self.training_labels
+        return self.testing_images,self.testing_labels
     
     def get_validation(self):
         return self.validation_images,self.validation_labels
