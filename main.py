@@ -45,7 +45,7 @@ print("Testing Accuracy: {}".format(clf_svm.score(X_test, y_test)))
 # Define the hyperparameters to search over
 c_values = [0.1, 1, 10]
 gamma_values = [0.01, 0.1, 1]
-degree_values = [2, 3, 4]
+kernel_values = ['poly', 'rbf', 'sigmoid']
 
 # Create empty lists to store the results
 best_accuracy = 0
@@ -53,9 +53,9 @@ best_params = {}
 
 for c in c_values:
     for gamma in gamma_values:
-        for degree in degree_values:
+        for kernel in kernel_values:
             # Create the SVM classifier with the current hyperparameters
-            clf_svm = SVC(kernel='poly', C=c, gamma=gamma, degree=degree)
+            clf_svm = SVC(kernel=kernel, C=c, gamma=gamma)
 
             # Train the classifier on the training set
             clf_svm.fit(X_train, y_train)
@@ -65,20 +65,20 @@ for c in c_values:
             accuracy = accuracy_score(y_val, y_pred)
 
             # Print out the current hyperparameters and their validation accuracy
-            print("Hyperparameters: C={}, gamma={}, degree={}".format(c, gamma, degree))
+            print("Hyperparameters: C={}, gamma={}, degree={}".format(kernel, c, gamma))
             print("Validation accuracy: {}".format(accuracy))
 
             # Update the best hyperparameters if the current model is better
             if accuracy > best_accuracy:
                 best_accuracy = accuracy
-                best_params = {'C': c, 'gamma': gamma, 'degree': degree}
+                best_params = {'kernel': kernel, 'C': c, 'gamma': gamma}
 
 # Print out the best hyperparameters and their validation accuracy
 print("Best hyperparameters: ", best_params)
 print("Validation accuracy: ", best_accuracy)
 
 # Create the SVM classifier with the best hyperparameters
-clf_svm = SVC(kernel='poly', C=best_params['C'], gamma=best_params['gamma'], degree=best_params['degree'])
+clf_svm = SVC(kernel=best_params['kernel'], C=best_params['C'], gamma=best_params['gamma'])
 
 # Train the classifier on the training set
 clf_svm.fit(X_train, y_train)
