@@ -76,3 +76,17 @@ for c in c_values:
 # Print out the best hyperparameters and their validation accuracy
 print("Best hyperparameters: ", best_params)
 print("Validation accuracy: ", best_accuracy)
+
+# Create the SVM classifier with the best hyperparameters
+clf_svm = SVC(kernel='poly', C=best_params['C'], gamma=best_params['gamma'], degree=best_params['degree'])
+
+# Train the classifier on the training set
+clf_svm.fit(X_train, y_train)
+
+# Evaluate the classifier on the test set
+y_pred = clf_svm.predict(X_test)
+accuracy = accuracy_score(y_test, y_pred)
+
+# Print out the test accuracy
+print("Test accuracy: ", accuracy)
+
